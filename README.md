@@ -21,15 +21,64 @@ Execute the C Program for the desired output.
 # PROGRAM:
 
 ## C program that receives a message from message queue and display them
+sender.c
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <string.h>
 
+struct message
+{
+    long type;
+    char text[100];
+};
 
+int main()
+{
+    key_t key = ftok(".", 'a');
+    int msgid = msgget(key, 0666 | IPC_CREAT);
 
+    struct message msg;
+    msg.type = 1;
 
+    strcpy(msg.text, "monish");
 
+    msgsnd(msgid, &msg, sizeof(msg.text), 0);
+
+    return 0;
+}
+
+writer.c
+
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+struct message
+{
+    long type;
+    char text[100];
+};
+
+int main()
+{
+    key_t key = ftok(".", 'a');
+    int msgid = msgget(key, 0666 | IPC_CREAT);
+
+    struct message msg;
+
+    printf("Waiting for message...\n");
+
+    msgrcv(msgid, &msg, sizeof(msg.text), 1, 0);
+
+    printf("Received: %s\n", msg.text);
+
+    return 0;
+}
 ## OUTPUT
 
 
 
-
+![Alt text](4.2.png)
 # RESULT:
 The programs are executed successfully.
